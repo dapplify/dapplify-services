@@ -1,7 +1,6 @@
 const DateHelper = require('./DateHelper');
 const JWTHelper = require('./JWTHelper');
 const MutexHelper = require('./MutexHelper');
-const { DocumentHelper, IdentityHelper } = require('encryptify-lib');
 
 module.exports = class HelperFactory {
   static getDateHelper(logger) {

@@ -9,7 +9,7 @@ const schema = mongoose.Schema({
     type: 'String',
     required: true,
   },
-  domain:  {
+  domain: {
     type: 'String',
     required: true,
   },
