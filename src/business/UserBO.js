@@ -121,13 +121,11 @@ module.exports = class DocumentBO {
     address = address.toLowerCase();
     this.logger.debug(`[UserBO.updatePin()] Updating ${address} pin`);
 
-    const key =
-      address +
-      this.dateHelper.getNow().toString() +
-      crypto.randomBytes(256).toString('hex');
-    const pin = this.identityHelper.generateHash(key);
+    const pin = this.identityHelper.generateHash(
+      crypto.randomBytes(256).toString('hex')
+    );
 
-    this.logger.debug(`[UserBO.updatePin()] New pin to the ${address}: ${pin}`);
+    this.logger.debug(`[UserBO.updatePin()] New pin to  ${address}: ${pin}`);
 
     const userByAddress = await this.model.getFirstByFilter({ address });
 

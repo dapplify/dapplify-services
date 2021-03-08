@@ -1,6 +1,7 @@
 const BOFactory = require('../business/BOFactory');
 const RequestRunner = require('./RequestRunner');
 const HelperFactory = require('../helpers/HelperFactory');
+const EventType = require('../business/EventType');
 
 module.exports = class DocumentRoute {
   static configure(app) {
@@ -39,45 +40,54 @@ module.exports = class DocumentRoute {
     const jwtHelper = HelperFactory.getJWTHelper(req.logger);
     const bo = BOFactory.getUserBO(req.logger);
     const dappBO = BOFactory.getDAppBO(req.logger);
+    const eventBO = BOFactory.getEventBO(req.logger);
 
     const { address, pin, signature } = req.body;
     const { uniqueId } = req.params;
 
-    let jwtConfig = null;
-
-    if (uniqueId) {
-      const dapp = await dappBO.getByUniqueId({ uniqueId });
-      console.log(dapp);
-
-      if (!dapp) {
-        throw {
-          status: 404,
-          code: 'DAPP_NOT_FOUND',
-          uniqueId,
-        };
-      }
-
-      jwtConfig = dapp.jwt;
-    }
-
-    const result = await bo.checkPinSignature(address, pin, signature);
-
-    if (result) {
-      await bo.updatePin(address);
-
-      return {
-        token: jwtHelper.createToken({ address }, jwtConfig),
-        address,
-        pin,
-        signature,
-      };
-    } else {
-      return {
+    if (!(await bo.checkPinSignature(address, pin, signature))) {
+      throw {
         code: 'INVALID_PIN_SIGNATURE',
         pin,
         signature,
         address,
       };
     }
+
+    const dapp = await dappBO.getByUniqueId({ uniqueId });
+    const jwtConfig = dapp ? dapp.jwt : null;
+
+    if (uniqueId && !dapp) {
+      throw {
+        status: 404,
+        code: 'DAPP_NOT_FOUND',
+        uniqueId,
+      };
+    }
+
+    const token = jwtHelper.createToken({ address }, jwtConfig);
+
+    if (dapp) {
+      await eventBO.save({
+        type: EventType.LOGIN,
+        title: `A JWT token was generated to ${address}`,
+        dapp,
+        data: {
+          token,
+          address,
+          pin,
+        },
+        address,
+      });
+    }
+
+    await bo.updatePin(address);
+
+    return {
+      token,
+      address,
+      pin,
+      signature,
+    };
   }
 };

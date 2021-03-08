@@ -1,11 +1,13 @@
 const { IdentityHelper } = require('encryptify-lib');
 
 const DAppBO = require('./DAppBO');
+const EventBO = require('./EventBO');
 const UserBO = require('./UserBO');
 const Model = require('./Model');
 const HelperFactory = require('../helpers/HelperFactory');
 
 const dapp = require('../models/dapp');
+const event = require('../models/event');
 const user = require('../models/user');
 
 module.exports = class BOFactory {
@@ -14,6 +16,16 @@ module.exports = class BOFactory {
       {
         model: new Model(dapp, logger),
         identityHelper: IdentityHelper,
+        dateHelper: HelperFactory.getDateHelper(logger),
+      },
+      logger
+    );
+  }
+
+  static getEventBO(logger) {
+    return new EventBO(
+      {
+        model: new Model(event, logger),
         dateHelper: HelperFactory.getDateHelper(logger),
       },
       logger

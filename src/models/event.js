@@ -1,48 +1,44 @@
 const mongoose = require('mongoose');
 
 const schema = mongoose.Schema({
-  uniqueId: {
+  type: {
     type: String,
     required: true,
   },
-  name: {
+  title: {
     type: String,
     required: true,
   },
-  domain: {
-    type: String,
-    required: true,
-  },
-  from: {
-    type: String,
-    required: true,
-  },
-  jwt: {
-    secret: {
+  dapp: {
+    uniqueId: {
       type: String,
       required: true,
     },
-    expiresIn: {
+    name: {
+      type: String,
+      required: true,
+    },
+    domain: {
+      type: String,
+      required: true,
+    },
+    from: {
       type: String,
       required: true,
     },
   },
-  signature: {
+  address: {
     type: String,
     required: true,
   },
-  isEnabled: {
-    type: Boolean,
+  data: {
+    type: Object,
     required: true,
   },
   createdAt: {
     type: Date,
     required: true,
   },
-  updateAt: {
-    type: Date,
-    required: false,
-  },
 });
 
-module.exports = mongoose.model('dapps', schema);
+module.exports = mongoose.model('events', schema);
