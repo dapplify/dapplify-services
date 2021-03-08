@@ -1,3 +1,3 @@
-# dauthtools-services
+# dapplify-services
 
-The main repository for dAuth Tools Services
+The main repository for dApplify Tools Services

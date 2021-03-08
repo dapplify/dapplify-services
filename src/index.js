@@ -24,7 +24,7 @@ app.use(BaseMiddleware.parseCurrentUser());
 
 app.listen(Settings.port, () => {
   const logger = new Logger();
-  logger.debug(`dAuth Tools Service listening at port ${Settings.port}`);
+  logger.debug(`dApplify Tools Service listening at port ${Settings.port}`);
 });
 
 DAppRoute.configure(app);
