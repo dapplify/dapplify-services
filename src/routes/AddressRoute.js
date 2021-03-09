@@ -84,11 +84,6 @@ module.exports = class AddressRoute {
 
     const entity = { ...req.body };
 
-    console.log(dapp.from.toLowerCase())
-    console.log(req.currentUser.address.toLowerCase())
-    console.log(entity.address.toLowerCase())
-    console.log(req.currentUser.address.toLowerCase())
-
     if (
       dapp.from.toLowerCase() !== req.currentUser.address.toLowerCase() &&
       entity.address.toLowerCase() !== req.currentUser.address.toLowerCase()
