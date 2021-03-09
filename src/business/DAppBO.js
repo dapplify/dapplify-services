@@ -40,13 +40,14 @@ module.exports = class DAppBO {
     this.logger.debug(`[DAppBO.save()] The JSON content hash is ${dappHash}`);
 
     this.logger.debug(
-      '[DAppBO.save()] Recovering the from address by the signature'
+      `[DAppBO.save()] Recovering the from address by the signature: ${entity.signature}`
     );
     const from = this.identityHelper
       .recoverAddress(entity.signature, dappHash)
       .toLowerCase();
+    this.logger.debug(`[DAppBO.save()] Recovered address: ${from}`);
 
-    if (from.toLowerCase() !== entity.from.toLowerCase()) {
+    if (from !== entity.from.toLowerCase()) {
       throw {
         status: 409,
         code: 'INVALID_FROM',
@@ -54,7 +55,6 @@ module.exports = class DAppBO {
         entity,
       };
     }
-    this.logger.debug(`[DAppBO.save()] Recovered address: ${from}`);
 
     this.logger.debug(
       `[DAppBO.save()] Saving the entity to database: ${entity.name}`
@@ -80,6 +80,10 @@ module.exports = class DAppBO {
     } else {
       return this.model.getFirstByFilter({ uniqueId });
     }
+  }
+
+  async checkIfAddressIsOwner({ uniqueId, from }) {
+    return (await this.getByUniqueId({ uniqueId, from })) !== null;
   }
 
   getAll({ from }, pagination) {

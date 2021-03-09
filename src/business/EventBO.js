@@ -11,7 +11,7 @@ module.exports = class DAppBO {
 
   async save(entity) {
     this.logger.debug(
-      `[EventBO.save()] Processing a new event: ${entity.type} - ${entity.type}`
+      `[EventBO.save()] Processing a new event: ${entity.type} - ${entity.title}`
     );
 
     const newEntity = await this.model.create({
@@ -21,7 +21,7 @@ module.exports = class DAppBO {
     });
 
     this.logger.debug(
-      `[EventBO.save()] Entity saved successfully: ${entity.type} - ${entity.type}`
+      `[EventBO.save()] Entity saved successfully: ${entity.type} - ${entity.title}`
     );
 
     return newEntity;

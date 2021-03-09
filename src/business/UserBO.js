@@ -39,6 +39,9 @@ module.exports = class DocumentBO {
       const userByAddres = await this.getByAddress(address);
 
       if (!userByAddres) {
+        this.logger.debug(
+          `Recovering address, publicKey and compressedPublicKey (signature, pin): (${signature}, ${pin})`
+        );
         const publicKey = this.identityHelper.recoverPublicKey(signature, pin);
         const compressedPublicKey = this.identityHelper.compressPublicKey(
           publicKey
@@ -47,6 +50,9 @@ module.exports = class DocumentBO {
           signature,
           pin
         );
+        this.logger.debug(`address: ${recoveredAddress}`);
+        this.logger.debug(`publicKey: ${publicKey}`);
+        this.logger.debug(`compressedPublicKey: ${compressedPublicKey}`);
 
         if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
           throw {
@@ -75,8 +81,8 @@ module.exports = class DocumentBO {
 
   async save({ address, publicKey, compressedPublicKey }) {
     address = address.toLowerCase();
-    publicKey = address.toLowerCase();
-    compressedPublicKey = address.toLowerCase();
+    publicKey = publicKey.toLowerCase();
+    compressedPublicKey = compressedPublicKey.toLowerCase();
 
     const [
       userByAddress,

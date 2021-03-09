@@ -10,6 +10,7 @@ module.exports = class DataHelper {
   constructor() {
     this.logger = new Logger();
     this.dappBO = BOFactory.getDAppBO(this.logger);
+    this.addressDetailBO = BOFactory.getAddressDetailBO(this.logger);
     this.userBO = BOFactory.getUserBO(this.logger);
     this.server = require('../src/index');
 
@@ -35,20 +36,32 @@ module.exports = class DataHelper {
   }
 
   clearData() {
-    return Promise.all([this.dappBO.clear(), this.userBO.clear()]);
+    return Promise.all([
+      this.dappBO.clear(),
+      this.userBO.clear(),
+      this.addressDetailBO.clear(),
+    ]);
+  }
+
+  async createDefaultDApp(user) {
+    const token = await this.getUserToken(user);
+    const dapp = {
+      uniqueId: 'DAPP_ID',
+      name: 'mydapp',
+      domain: 'www.mydapp.com',
+      from: user.address.toLowerCase(),
+      jwt: {
+        secret: 'JWT_SECRET',
+        expiresIn: '1h',
+      },
+    };
+
+    dapp.signature = await this.generateHashAndSign(user, dapp);
+
+    return this.post('/v1/dapps', dapp, 201, token);
   }
 
   async getUserToken(user) {
-    await this.post(
-      '/v1/users',
-      {
-        address: user.address,
-        publicKey: user.publicKey,
-        compressedPublicKey: user.compressedPublicKey,
-      },
-      201
-    );
-
     const info = await this.get(`/v1/users/${user.address}/pin`);
     const signature = IdentityHelper.sign(user.privateKey, info.pin);
 
@@ -87,6 +100,25 @@ module.exports = class DataHelper {
   async post(endpoint, data, expected, token) {
     const chain = request(this.server)
       .post(endpoint)
+      .send(data)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(expected || 200);
+
+    let res = null;
+
+    if (token) {
+      res = await chain.set('Authorization', `Bearer ${token}`);
+    } else {
+      res = await chain;
+    }
+
+    return res.body;
+  }
+
+  async put(endpoint, data, expected, token) {
+    const chain = request(this.server)
+      .put(endpoint)
       .send(data)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)

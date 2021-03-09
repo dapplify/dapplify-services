@@ -11,7 +11,7 @@ module.exports = class Database {
       useUnifiedTopology: true,
       useFindAndModify: false,
     });
-    mongoose.set('debug', true);
+    mongoose.set('debug', false);
 
     mongoose.connection.on('connected', function () {
       logger.debug('Mongoose! Connected at ' + Settings.mongoUrl);

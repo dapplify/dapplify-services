@@ -15,6 +15,8 @@ module.exports = class DocumentRoute {
       .route('/v1/users/auth')
       .post(RequestRunner.run(200, DocumentRoute.checkPinSignature));
 
+    app.route('/v1/users/me').get(RequestRunner.run(200, DocumentRoute.getMe));
+
     app
       .route('/v1/dapps/:uniqueId/users/:address/pin')
       .get(RequestRunner.run(200, DocumentRoute.getPin));
@@ -89,5 +91,9 @@ module.exports = class DocumentRoute {
       pin,
       signature,
     };
+  }
+
+  static async getMe(req) {
+    return req.currentUser;
   }
 };

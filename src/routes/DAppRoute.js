@@ -27,7 +27,7 @@ module.exports = class DAppRoute {
     const bo = BOFactory.getDAppBO(req.logger);
     const entity = { ...req.body };
     entity.from = req.currentUser.address;
-    return bo.save({ ...req.body });
+    return bo.save(entity);
   }
 
   static getById(req) {
@@ -35,8 +35,6 @@ module.exports = class DAppRoute {
 
     const { uniqueId } = req.params;
     const from = req.currentUser.address;
-
-    console.log({ from });
 
     return bo.getByUniqueId({ uniqueId, from });
   }

@@ -5,6 +5,7 @@ const logger = require('morgan');
 const Settings = require('./config/Settings.js');
 const DAppRoute = require('./routes/DAppRoute.js');
 const UserRoute = require('./routes/UserRoute.js');
+const AddressRoute = require('./routes/AddressRoute.js');
 const Logger = require('./config/logger.js');
 const Database = require('./config/Database.js');
 const BaseMiddleware = require('./routes/BaseMiddleware.js');
@@ -28,6 +29,7 @@ app.listen(Settings.port, () => {
 });
 
 DAppRoute.configure(app);
+AddressRoute.configure(app);
 UserRoute.configure(app);
 
 module.exports = app;

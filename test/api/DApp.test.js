@@ -2,7 +2,7 @@ const chai = require('chai');
 const { expect } = chai;
 const DataHelper = require('../DataHelper');
 
-describe('API > DAppBO', () => {
+describe('API > DApp', () => {
   let dataHelper = new DataHelper();
 
   const saveItem = async (user, token, { uniqueId, name, domain, jwt }) => {
@@ -10,7 +10,7 @@ describe('API > DAppBO', () => {
       uniqueId,
       name,
       domain,
-      from: user.address,
+      from: user.address.toLowerCase(),
       jwt,
     };
 
@@ -48,7 +48,7 @@ describe('API > DAppBO', () => {
     expect(recoveredObject.jwt.expiresIn).to.be.equal(savedItem.jwt.expiresIn);
   });
 
-  it.only('should authenticate a user in a dapp', async () => {
+  it('should authenticate a user in a dapp', async () => {
     const token = await dataHelper.getUserToken(dataHelper.users.user1);
     const savedItem = await saveItem(dataHelper.users.user1, token, {
       uniqueId: 'uniqueId',

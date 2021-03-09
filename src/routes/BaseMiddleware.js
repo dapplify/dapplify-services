@@ -8,7 +8,6 @@ const uuidv4 = v4;
 module.exports = class BaseMiddleware {
   static parseSorting() {
     return (req, res, next) => {
-      console.log(req.query);
       const { sort, limit, offset } = req.query;
       req.pagination = {
         sort,
@@ -37,7 +36,7 @@ module.exports = class BaseMiddleware {
         next();
       } else {
         res.status(403).json({
-          error: 'INVALID_JWT_TOKEN',
+          code: 'INVALID_JWT_TOKEN',
         });
       }
     };
@@ -80,13 +79,13 @@ module.exports = class BaseMiddleware {
               '[BaseMiddleware.parseCurrentUser()] The Bearer Authorization is invalid'
             );
             res.status(401).json({
-              error: 'INVALID_JWT_TOKEN',
+              code: 'INVALID_JWT_TOKEN',
             });
           }
         } catch (e) {
           console.log(e);
           res.status(401).json({
-            error: 'INVALID_JWT_TOKEN',
+            code: 'INVALID_JWT_TOKEN',
           });
         }
       } else {
@@ -94,6 +93,40 @@ module.exports = class BaseMiddleware {
           '[BaseMiddleware.parseCurrentUser()] There is no Bearer Authorization token'
         );
         next();
+      }
+    };
+  }
+
+  static parseCurrentDApp(isRequired) {
+    return async (req, res, next) => {
+      const dappBO = BOFactory.getDAppBO(req.logger);
+
+      req.logger.debug(
+        '[BaseMiddleware.parseCurrentDApp()] Checking if there is a uniqueId param'
+      );
+
+      const { uniqueId } = req.params;
+
+      if (uniqueId) {
+        req.dapp = await dappBO.getByUniqueId({ uniqueId });
+      }
+
+      if (req.dapp) {
+        req.logger.debug(
+          '[BaseMiddleware.parseCurrentDApp()] A DApp was found'
+        );
+
+        next();
+      } else {
+        req.logger.debug(
+          '[BaseMiddleware.parseCurrentDApp()] A DApp was NOT found'
+        );
+
+        if (isRequired) {
+          res.status(404).json({
+            code: 'DAPP_NOT_FOUND',
+          });
+        }
       }
     };
   }
