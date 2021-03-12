@@ -6,28 +6,28 @@ const EventType = require('../business/EventType');
 module.exports = class AddressRoute {
   static configure(app) {
     app
-      .route('/v1/dapps/:uniqueId/addresses')
+      .route('/v1/addresses')
       .get(
         BaseMiddleware.requireLogin(),
-        BaseMiddleware.parseCurrentDApp(true),
+        BaseMiddleware.requireDApp(),
         RequestRunner.run(200, AddressRoute.getAll)
       )
       .post(
         BaseMiddleware.requireLogin(),
-        BaseMiddleware.parseCurrentDApp(true),
+        BaseMiddleware.requireDApp(),
         RequestRunner.run(201, AddressRoute.save)
       );
 
     app
-      .route('/v1/dapps/:uniqueId/addresses/:address')
+      .route('/v1/addresses/:address')
       .get(
         BaseMiddleware.requireLogin(),
-        BaseMiddleware.parseCurrentDApp(true),
+        BaseMiddleware.requireDApp(),
         RequestRunner.run(200, AddressRoute.getByAddress)
       )
       .put(
         BaseMiddleware.requireLogin(),
-        BaseMiddleware.parseCurrentDApp(true),
+        BaseMiddleware.requireDApp(),
         RequestRunner.run(200, AddressRoute.update)
       );
   }

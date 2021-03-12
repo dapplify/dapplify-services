@@ -48,26 +48,6 @@ describe('API > DApp', () => {
     expect(recoveredObject.jwt.expiresIn).to.be.equal(savedItem.jwt.expiresIn);
   });
 
-  it('should authenticate a user in a dapp', async () => {
-    const token = await dataHelper.getUserToken(dataHelper.users.user1);
-    const savedItem = await saveItem(dataHelper.users.user1, token, {
-      uniqueId: 'uniqueId',
-      name: 'mydapp',
-      domain: 'www.mydapp.com',
-      jwt: {
-        secret: '0a391f10-f8bd-47c2-b7da-9aa74a1ca4fb',
-        expiresIn: '1h',
-      },
-    });
-
-    const dappUserToken = await dataHelper.getDAppUserToken(
-      savedItem.uniqueId,
-      dataHelper.users.user2
-    );
-
-    console.log(dappUserToken);
-  });
-
   it('should fail to save a dapp with a user and get it using another user', async () => {
     const user1Token = await dataHelper.getUserToken(dataHelper.users.user1);
     const user2Token = await dataHelper.getUserToken(dataHelper.users.user2);

@@ -46,6 +46,7 @@ module.exports = class BaseMiddleware {
     return async (req, res, next) => {
       const jwtHelper = HelperFactory.getJWTHelper();
       const userBO = BOFactory.getUserBO(req.logger);
+      const jwetSettings = req.dapp ? req.dapp.jwt : null;
 
       req.logger.debug(
         '[BaseMiddleware.parseCurrentUser()] Checking if there is Bearer Authorization token'
@@ -65,7 +66,7 @@ module.exports = class BaseMiddleware {
           req.logger.debug(
             `[BaseMiddleware.parseCurrentUser()] Decoding the token: ${token}`
           );
-          const user = jwtHelper.decodeToken(token);
+          const user = jwtHelper.decodeToken(token, jwetSettings);
 
           if (user) {
             req.logger.debug(
@@ -97,7 +98,19 @@ module.exports = class BaseMiddleware {
     };
   }
 
-  static parseCurrentDApp(isRequired) {
+  static requireDApp() {
+    return (req, res, next) => {
+      if (req.dapp) {
+        next();
+      } else {
+        res.status(404).json({
+          code: 'DAPP_NOT_FOUND',
+        });
+      }
+    };
+  }
+
+  static parseCurrentDApp() {
     return async (req, res, next) => {
       const dappBO = BOFactory.getDAppBO(req.logger);
 
@@ -105,7 +118,7 @@ module.exports = class BaseMiddleware {
         '[BaseMiddleware.parseCurrentDApp()] Checking if there is a uniqueId param'
       );
 
-      const { uniqueId } = req.params;
+      const uniqueId = req.headers['x-dapp-id'];
 
       if (uniqueId) {
         req.dapp = await dappBO.getByUniqueId({ uniqueId });
@@ -115,19 +128,13 @@ module.exports = class BaseMiddleware {
         req.logger.debug(
           '[BaseMiddleware.parseCurrentDApp()] A DApp was found'
         );
-
-        next();
       } else {
         req.logger.debug(
           '[BaseMiddleware.parseCurrentDApp()] A DApp was NOT found'
         );
-
-        if (isRequired) {
-          res.status(404).json({
-            code: 'DAPP_NOT_FOUND',
-          });
-        }
       }
+
+      next();
     };
   }
 };

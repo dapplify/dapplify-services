@@ -24,10 +24,11 @@ describe('API > Addresses', () => {
     };
 
     const newEntity = await dataHelper.post(
-      `/v1/dapps/${dapp.uniqueId}/addresses`,
+      '/v1/addresses',
       addressDetail,
       201,
-      token
+      token,
+      dapp.uniqueId
     );
 
     expect(newEntity.roles[0]).to.be.equal('admin', 'Fail to check the role');
@@ -65,20 +66,22 @@ describe('API > Addresses', () => {
     };
 
     const newEntity = await dataHelper.post(
-      `/v1/dapps/${dapp.uniqueId}/addresses`,
+      '/v1/addresses',
       addressDetail,
       201,
-      token
+      token,
+      dapp.uniqueId
     );
 
     const updatedEntity = await dataHelper.put(
-      `/v1/dapps/${dapp.uniqueId}/addresses/${address.address}`,
+      `/v1/addresses/${address.address}`,
       {
         ...addressDetail,
         name: 'New Name',
       },
       200,
-      token
+      token,
+      dapp.uniqueId
     );
 
     expect(newEntity.roles[0]).to.be.equal('user', 'Fail to check the role');
@@ -121,10 +124,11 @@ describe('API > Addresses', () => {
     };
 
     await dataHelper.post(
-      `/v1/dapps/${dapp.uniqueId}/addresses`,
+      '/v1/addresses',
       addressDetail,
       401,
-      token
+      token,
+      dapp.uniqueId
     );
   });
 
@@ -146,30 +150,33 @@ describe('API > Addresses', () => {
     };
 
     await dataHelper.post(
-      `/v1/dapps/${dapp.uniqueId}/addresses`,
+      '/v1/addresses',
       addressDetail,
       201,
-      token1
+      token1,
+      dapp.uniqueId
     );
 
     await dataHelper.put(
-      `/v1/dapps/${dapp.uniqueId}/addresses/${address1.address}`,
+      `/v1/addresses/${address1.address}`,
       {
         ...addressDetail,
         name: 'New Name',
       },
       401,
-      token2
+      token2,
+      dapp.uniqueId
     );
 
     await dataHelper.put(
-      `/v1/dapps/${dapp.uniqueId}/addresses/${address1.address}`,
+      `/v1/addresses/${address1.address}`,
       {
         ...addressDetail,
         name: 'New Name',
       },
       200,
-      owner
+      owner,
+      dapp.uniqueId
     );
   });
 });

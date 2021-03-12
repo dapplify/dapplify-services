@@ -22,6 +22,7 @@ app.use(cookieParser());
 app.use(BaseMiddleware.parseSorting());
 app.use(BaseMiddleware.createLogger());
 app.use(BaseMiddleware.parseCurrentUser());
+app.use(BaseMiddleware.parseCurrentDApp());
 
 app.listen(Settings.port, () => {
   const logger = new Logger();

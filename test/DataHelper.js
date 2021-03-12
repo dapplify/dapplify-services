@@ -1,4 +1,5 @@
 const BOFactory = require('../src/business/BOFactory');
+const HelperFactory = require('../src/helpers/HelperFactory');
 const Logger = require('../src/config/Logger');
 const Database = require('../src/config/Database.js');
 const request = require('supertest');
@@ -13,6 +14,7 @@ module.exports = class DataHelper {
     this.addressDetailBO = BOFactory.getAddressDetailBO(this.logger);
     this.userBO = BOFactory.getUserBO(this.logger);
     this.server = require('../src/index');
+    this.jwtHelper = HelperFactory.getJWTHelper(this.logger);
 
     this.initializeData();
   }
@@ -79,25 +81,25 @@ module.exports = class DataHelper {
   }
 
   async getDAppUserToken(uniqueId, user) {
-    const info = await this.get(
-      `/v1/dapps/${uniqueId}/users/${user.address}/pin`
-    );
+    const info = await this.get(`/v1/${user.address}/pin`);
     const signature = IdentityHelper.sign(user.privateKey, info.pin);
 
     const authInfo = await this.post(
-      `/v1/dapps/${uniqueId}/users/auth`,
+      '/v1/users/auth',
       {
         address: user.address,
         signature,
         pin: info.pin,
       },
-      200
+      200,
+      null,
+      uniqueId
     );
 
     return authInfo.token;
   }
 
-  async post(endpoint, data, expected, token) {
+  async post(endpoint, data, expected, token, dappId) {
     const chain = request(this.server)
       .post(endpoint)
       .send(data)
@@ -105,6 +107,10 @@ module.exports = class DataHelper {
       .expect('Content-Type', /json/)
       .expect(expected || 200);
 
+    if (dappId) {
+      chain.set('x-dapp-id', dappId);
+    }
+
     let res = null;
 
     if (token) {
@@ -116,7 +122,7 @@ module.exports = class DataHelper {
     return res.body;
   }
 
-  async put(endpoint, data, expected, token) {
+  async put(endpoint, data, expected, token, dappId) {
     const chain = request(this.server)
       .put(endpoint)
       .send(data)
@@ -124,6 +130,10 @@ module.exports = class DataHelper {
       .expect('Content-Type', /json/)
       .expect(expected || 200);
 
+    if (dappId) {
+      chain.set('x-dapp-id', dappId);
+    }
+
     let res = null;
 
     if (token) {
@@ -135,12 +145,16 @@ module.exports = class DataHelper {
     return res.body;
   }
 
-  async get(endpoint, token, expected) {
+  async get(endpoint, token, expected, dappId) {
     const chain = request(this.server)
       .get(endpoint)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(expected || 200);
+
+    if (dappId) {
+      chain.set('x-dapp-id', dappId);
+    }
 
     let res = null;
 

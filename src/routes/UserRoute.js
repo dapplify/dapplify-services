@@ -16,14 +16,6 @@ module.exports = class DocumentRoute {
       .post(RequestRunner.run(200, DocumentRoute.checkPinSignature));
 
     app.route('/v1/users/me').get(RequestRunner.run(200, DocumentRoute.getMe));
-
-    app
-      .route('/v1/dapps/:uniqueId/users/:address/pin')
-      .get(RequestRunner.run(200, DocumentRoute.getPin));
-
-    app
-      .route('/v1/dapps/:uniqueId/users/auth')
-      .post(RequestRunner.run(200, DocumentRoute.checkPinSignature));
   }
 
   static async getPin(req) {
@@ -41,11 +33,9 @@ module.exports = class DocumentRoute {
   static async checkPinSignature(req) {
     const jwtHelper = HelperFactory.getJWTHelper(req.logger);
     const bo = BOFactory.getUserBO(req.logger);
-    const dappBO = BOFactory.getDAppBO(req.logger);
     const eventBO = BOFactory.getEventBO(req.logger);
 
     const { address, pin, signature } = req.body;
-    const { uniqueId } = req.params;
 
     if (!(await bo.checkPinSignature(address, pin, signature))) {
       throw {
@@ -56,18 +46,11 @@ module.exports = class DocumentRoute {
       };
     }
 
-    const dapp = await dappBO.getByUniqueId({ uniqueId });
+    const dapp = req.dapp;
+    const uniqueId = req.dapp ? req.dapp.uniqueId : undefined;
     const jwtConfig = dapp ? dapp.jwt : null;
 
-    if (uniqueId && !dapp) {
-      throw {
-        status: 404,
-        code: 'DAPP_NOT_FOUND',
-        uniqueId,
-      };
-    }
-
-    const token = jwtHelper.createToken({ address }, jwtConfig);
+    const token = jwtHelper.createToken({ address, uniqueId }, jwtConfig);
 
     if (dapp) {
       await eventBO.save({
