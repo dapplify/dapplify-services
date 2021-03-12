@@ -179,4 +179,52 @@ describe('API > Addresses', () => {
       dapp.uniqueId
     );
   });
+
+  it('should create a new address detail and login with it', async () => {
+    const user = await IdentityHelper.generateIdentity();
+    const token = await dataHelper.getUserToken(dataHelper.users.user1);
+    const dapp = await dataHelper.createDefaultDApp(dataHelper.users.user1);
+
+    const addressDetail = {
+      address: user.address,
+      name: 'User',
+      email: 'user@domain.com',
+      imageUrl: 'imageUrl',
+      roles: ['admin'],
+    };
+
+    await dataHelper.post(
+      '/v1/addresses',
+      addressDetail,
+      201,
+      token,
+      dapp.uniqueId
+    );
+
+    let info = await dataHelper.get(`/v1/users/${user.address}/pin`);
+    let signature = IdentityHelper.sign(user.privateKey, info.pin);
+
+    let authInfo = await dataHelper.post(
+      '/v1/users/auth',
+      {
+        address: user.address,
+        signature,
+        pin: info.pin,
+      },
+      200,
+      null,
+      dapp.uniqueId
+    );
+
+    const parsedUserToken = dataHelper.jwtHelper.decodeToken(
+      authInfo.token,
+      dapp.jwt
+    );
+
+    expect(parsedUserToken.address.toLowerCase()).to.be.equal(
+      user.address.toLowerCase()
+    );
+    expect(parsedUserToken.uniqueId).to.be.equal(dapp.uniqueId);
+    expect(parsedUserToken.roles[0]).to.be.equal('admin');
+  });
 });

@@ -50,7 +50,25 @@ module.exports = class DocumentRoute {
     const uniqueId = req.dapp ? req.dapp.uniqueId : undefined;
     const jwtConfig = dapp ? dapp.jwt : null;
 
-    const token = jwtHelper.createToken({ address, uniqueId }, jwtConfig);
+    let roles = ['user'];
+
+    if (dapp) {
+      const addressBO = BOFactory.getAddressBO(req.logger);
+
+      const addressDetail = await addressBO.getAddressDetail({
+        address,
+        uniqueId,
+      });
+
+      if (addressDetail) {
+        roles = addressDetail.roles;
+      }
+    }
+
+    const token = jwtHelper.createToken(
+      { address, uniqueId, roles },
+      jwtConfig
+    );
 
     if (dapp) {
       await eventBO.save({
