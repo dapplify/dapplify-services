@@ -11,7 +11,7 @@ module.exports = class DataHelper {
   constructor() {
     this.logger = new Logger();
     this.dappBO = BOFactory.getDAppBO(this.logger);
-    this.addressDetailBO = BOFactory.getAddressDetailBO(this.logger);
+    this.addressBO = BOFactory.getAddressBO(this.logger);
     this.userBO = BOFactory.getUserBO(this.logger);
     this.server = require('../src/index');
     this.jwtHelper = HelperFactory.getJWTHelper(this.logger);
@@ -41,7 +41,7 @@ module.exports = class DataHelper {
     return Promise.all([
       this.dappBO.clear(),
       this.userBO.clear(),
-      this.addressDetailBO.clear(),
+      this.addressBO.clear(),
     ]);
   }
 

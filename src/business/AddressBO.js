@@ -1,4 +1,4 @@
-module.exports = class AddressDetailBO {
+module.exports = class AddressBO {
   constructor({ model, dateHelper }, logger) {
     this.logger = logger;
     this.model = model;
@@ -26,7 +26,7 @@ module.exports = class AddressDetailBO {
     }
 
     this.logger.debug(
-      `[AddressDetailBO.save()] Processing a new address detail: ${address} - ${JSON.stringify(
+      `[AddressBO.save()] Processing a new address detail: ${address} - ${JSON.stringify(
         entity.roles
       )}`
     );
@@ -39,7 +39,7 @@ module.exports = class AddressDetailBO {
     });
 
     this.logger.debug(
-      `[AddressDetailBO.save()] Entity saved successfully: ${address} - ${JSON.stringify(
+      `[AddressBO.save()] Entity saved successfully: ${address} - ${JSON.stringify(
         entity.roles
       )}`
     );

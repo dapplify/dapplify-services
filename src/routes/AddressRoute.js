@@ -33,7 +33,7 @@ module.exports = class AddressRoute {
   }
 
   static async save(req) {
-    const bo = BOFactory.getAddressDetailBO(req.logger);
+    const bo = BOFactory.getAddressBO(req.logger);
     const eventBO = BOFactory.getEventBO(req.logger);
 
     const dapp = req.dapp;
@@ -78,7 +78,7 @@ module.exports = class AddressRoute {
   }
 
   static async update(req) {
-    const bo = BOFactory.getAddressDetailBO(req.logger);
+    const bo = BOFactory.getAddressBO(req.logger);
     const eventBO = BOFactory.getEventBO(req.logger);
     const dapp = req.dapp;
 
@@ -135,7 +135,7 @@ module.exports = class AddressRoute {
   }
 
   static getByAddress(req) {
-    const bo = BOFactory.getAddressDetailBO(req.logger);
+    const bo = BOFactory.getAddressBO(req.logger);
     const { uniqueId, address } = req.params;
 
     return bo.getAddressDetail({ uniqueId, address });

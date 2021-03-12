@@ -63,4 +63,4 @@ const schema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('addressdetails', schema);
+module.exports = mongoose.model('address', schema);
